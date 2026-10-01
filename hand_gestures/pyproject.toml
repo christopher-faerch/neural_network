@@ -1,0 +1,12 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+qt_api = "pyside6"
+markers = [
+    "dataset: needs the sEMG-dataset files",
+    "model: needs trained checkpoints in results/<signal>/",
+    "gui: creates Qt widgets (runs offscreen)",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

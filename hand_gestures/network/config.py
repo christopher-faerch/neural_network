@@ -6,7 +6,7 @@ experiment share exactly the same windowing, split, model and training settings.
 from pathlib import Path
 
 # --------------------------------------------------------------------------- paths
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parents[1]      # the project folder (network/ is one level down)
 DATA_ROOT = PROJECT_ROOT / "sEMG-dataset"          # contains raw/ and filtered/
 RESULTS_DIR = PROJECT_ROOT / "results"
 

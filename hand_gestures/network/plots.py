@@ -10,7 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-import config as C
+from network import config as C
 
 CHANNEL_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]
 SIGNAL_COLORS = {"raw": "#eb6834", "filtered": "#2a78d6"}
@@ -335,6 +335,26 @@ def plot_cv_results(rows, out):
     ax.set_title(f"Leave-participants-out cross-validation ({C.CV_N_FOLDS} folds x 8 test participants); "
                  f"'_ens' = 5-seed ensembles")
     ax.legend(frameon=False, loc="lower left", fontsize=9, ncol=2)
+    return _save(fig, out)
+
+
+def plot_channel_ablation(df, out, signal_type):
+    """Strict and calibrated test accuracy for every channel subset, grouped by the number of channels."""
+    df = df.sort_values(["n_channels", "test_acc"]).reset_index(drop=True)
+    y = np.arange(len(df))
+    fig, ax = plt.subplots(figsize=(9, 0.42 * len(df) + 2))
+    ax.barh(y - 0.2, df["test_acc"], height=0.38, color=SIGNAL_COLORS[signal_type], label="strict")
+    ax.barh(y + 0.2, df["test_acc_calibrated"], height=0.38, color="#c3c2b7", label="calibrated (AdaBN)")
+    for yi, (a, b) in enumerate(zip(df["test_acc"], df["test_acc_calibrated"])):
+        ax.text(a + 0.005, yi - 0.2, f"{a:.2f}", va="center", fontsize=8)
+        ax.text(b + 0.005, yi + 0.2, f"{b:.2f}", va="center", fontsize=8, color="#52514e")
+    ax.set_yticks(y)
+    ax.set_yticklabels(df["channels"])
+    ax.axvline(1 / C.N_CLASSES, color="#c3c2b7", linestyle=":", linewidth=1)
+    ax.set_xlim(0, 1.0)
+    ax.set_xlabel("test accuracy (fixed split, 6 unseen participants)")
+    ax.set_title(f"Channel subsets, {signal_type} EMG: how many sensors are needed?")
+    ax.legend(frameon=False, loc="lower right")
     return _save(fig, out)
 
 

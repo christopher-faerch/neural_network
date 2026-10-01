@@ -20,9 +20,9 @@ import pandas as pd
 import torch
 import torch.nn as nn
 
-import config as C
-from data_loader import prepare_data, to_loader, save_split
-from model import EMGCNN, summarize
+from network import config as C
+from network.data_loader import prepare_data, to_loader, save_split
+from network.model import EMGCNN, summarize
 
 
 def set_seed(seed: int = C.SEED):
@@ -102,7 +102,7 @@ def fit(data, device, lr=C.LEARNING_RATE, batch_size=C.BATCH_SIZE, weight_decay=
     train_loader = to_loader(X_train, y_train, batch_size=batch_size, shuffle=True, seed=seed)
     val_loader = to_loader(X_val, y_val, batch_size=batch_size, shuffle=False)
 
-    model = EMGCNN(dropout=dropout).to(device)
+    model = EMGCNN(n_channels=X_train.shape[1], dropout=dropout).to(device)   # channel count follows the data
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 

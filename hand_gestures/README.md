@@ -138,7 +138,7 @@ the baseline but learned. Cross-entropy loss on the logits. `python model.py` pr
 AdamW, cross-entropy, mini-batches with shuffling, validation after every epoch, checkpoint of the
 epoch with the lowest validation loss, early stopping when the validation loss has not improved for
 `EARLY_STOPPING_PATIENCE` epochs, fixed seeds (Python, NumPy, PyTorch, cuDNN deterministic), device
-chosen automatically (CUDA if available, else CPU). All hyperparameters live in `config.py` and are
+chosen automatically (CUDA if available, else CPU). All hyperparameters live in `network/config.py` and are
 identical for the raw and the filtered run. The exact values and the small **validation-only**
 hyperparameter check that chose them are documented in section 7 and `results/tuning.csv`.
 
@@ -184,6 +184,10 @@ line (`--offset`, `--end-trim`, `--normalization`, `--augment`, `--ensemble`).
 
 ## 6. How to run
 
+The code is split into two packages: `network/` (PyTorch, data pipeline, training, evaluation,
+inference; imports no Qt) and `app/` (the PySide6 desktop application, section 11). Run every command
+from the project folder.
+
 ```bash
 # 1. environment (Python >= 3.10; a project-local venv was used)
 python -m venv .venv
@@ -191,49 +195,38 @@ python -m venv .venv
 pip install torch --index-url https://download.pytorch.org/whl/cu130   # or just: pip install torch  (CPU)
 pip install -r requirements.txt
 
-# 2. sanity checks (shapes, labels, one minibatch, loss, backprop, overfitting 80 windows)
-python sanity_checks.py --signal filtered
-python sanity_checks.py --signal raw
+# 2. neural-network workflow (headless)
+python -m network.main                                   # lists the commands
+python -m network.main summary                           # model table
+python -m network.main sanity --signal filtered          # shapes, labels, minibatch, loss, backprop, tiny-subset overfit
+python -m network.main plot-examples                     # dataset figures
+python -m network.main train --signal raw                # 5-seed ensemble on the fixed split (~1 s per epoch on an RTX 4080)
+python -m network.main train --signal filtered
+python -m network.main evaluate --signal raw             # test metrics, confusion matrices, failure cases, curves, AdaBN view
+python -m network.main evaluate --signal filtered
+python -m network.main baseline                          # RMS/MAV/WL features + logistic regression / random forest
+python -m network.main compare                           # raw vs filtered tables and figures
+python -m network.main cross-validate --label v2_timing_ens              # 5 folds x 8 participants, strict + calibrated
+python -m network.main cross-validate --label v1_baseline_ens --offset 0.0
+python -m network.main tune                              # validation-only hyperparameter check
+python -m network.main channel-ablation --signal raw     # train/test on every subset of the 4 channels
+python -m network.main predict --signal raw --subject 2 --start 14.5     # ask the ensemble about any window
+python -m network.main predict --signal filtered --subject 2 --start 0 --end 104 --smooth 3 --calibrate --plot
 
-# 3. dataset figures (example recording, example windows)
-python plot_examples.py
+# 3. desktop application
+python -m app.main                                       # offline mode, raw model
+python -m app.main --file recordings/my_recording.mat    # open a file immediately
+python -m app.main --replay sEMG-dataset/raw/mat/2_raw.mat   # simulated live source
+python -m app.main --cpu --model filtered
 
-# 4. train both experiments: 5 seeds each, identical settings (~1 s per epoch on an RTX 4080, minutes on CPU)
-python train.py --signal raw
-python train.py --signal filtered
-
-# 5. evaluate the ensembles on the test participants (metrics, confusion matrices, failure cases, curves,
-#    plus the smoothed, merged-class and AdaBN-calibrated views)
-python evaluate.py --signal raw
-python evaluate.py --signal filtered
-
-# 6. feature baseline and the raw-vs-filtered comparison
-python baseline.py
-python compare.py
-
-# optional: the validation-only hyperparameter check (test set never used)
-python tune.py
-
-# leave-participants-out cross-validation of a pipeline version (both signals, 5 seeds per fold, ~15 min on the GPU)
-python cross_validate.py --label v2_timing_ens                             # current config.py settings
-python cross_validate.py --label v1_baseline_ens --offset 0.0              # windows from the cue
-python cross_validate.py --label v4_endtrim_ens --end-trim 1.0             # windows 1-5 s instead of 1-6 s
-python cross_validate.py --label v5_rest_ens --normalization rest_rms      # per-participant rest-RMS scaling
-python cross_validate.py --label v3_aug --augment [--aug-noise 0]          # training-time augmentation
-
-# ask the trained ensemble what it sees in any piece of a recording
-python predict.py --signal filtered --subject 2 --cycle 1 --gesture 3 --position 4   # one labelled window
-python predict.py --signal filtered --subject 2 --start 14.5                          # 1 s from 14.5 s
-python predict.py --signal filtered --subject 2 --start 0 --end 104 --plot            # sliding window + figure
-python predict.py --signal filtered --subject 2 --start 0 --end 104 --smooth 3 --plot # ... averaging the last 3 windows
+# 4. tests
+python -m pytest -q                                      # 45 tests, ~15 s with dataset and checkpoints present
+python -m pytest -q -m "not dataset and not model"       # without them
 ```
 
-`predict.py` prints, per window, the true label (from the timeline, or "rest" between segments), the
-predicted gesture, its probability and the top-3 classes; `--smooth N` averages the probabilities of the
-last N windows before deciding (more evidence, more latency); `--plot` saves the window with its
-probability bars, or a prediction timeline for a sliding window.
-
-The dataset folder `sEMG-dataset/{raw,filtered}/mat/` must sit next to the scripts (see `config.py`).
+Each network command is the `main()` of the module with the same name (`python -m network.train --help`
+also works). The dataset folder `sEMG-dataset/{raw,filtered}/mat/` must sit in the project folder
+(`network/config.py`, `DATA_ROOT`).
 
 ---
 
@@ -352,6 +345,24 @@ calibrated from 0.78 to 0.90 (raw) and 0.75 to 0.92 (filtered).
   (+2), and adapting to the participant (+14). Augmentation, hyperparameters and trimming the segment end
   did not move the result beyond the fold noise.
 
+### 7.3 How many channels are needed? (`python -m network.main channel-ablation --signal raw`)
+
+Every subset of the four channels, 3-seed ensembles on the fixed split, raw signal
+(`results/channel_ablation_raw.csv`, `channel_ablation_raw.png`). Best subset per channel count:
+
+| sensors | best subset | strict test accuracy | calibrated (AdaBN) |
+|---|---|---|---|
+| 1 | CH1 | 0.45 | 0.60 |
+| 2 | CH1 + CH4 | 0.64 | 0.78 |
+| 3 | CH1 + CH3 + CH4 | 0.68 | 0.85 |
+| 4 | all | 0.67 | 0.84 |
+
+One channel is not enough (the other single channels reach 0.39 to 0.40). Two well-chosen channels
+(CH1 + CH4) lose only 3 points strict and 6 points calibrated against all four, whereas the wrong pair
+(CH1 + CH2) loses 19 points. Three channels without CH2 match or slightly beat all four; CH2 is the channel
+that saturates at the ADC limit in two of the six test participants, which may explain why dropping it does
+not hurt here. Differences of 2 to 3 points are within the noise of a 6-participant split.
+
 ### Figures
 
 | figure | file |
@@ -363,6 +374,7 @@ calibrated from 0.78 to 0.90 (raw) and 0.75 to 0.92 (filtered).
 | raw vs filtered comparison (fixed split) | `results/raw_vs_filtered.png`, `results/comparison.md` |
 | cross-validation of the pipeline versions, strict and calibrated | `results/cv/cv_results.png`, `cv_summary.csv` |
 | per-class recall per pipeline version | `results/cv/cv_per_class.png` |
+| channel subsets (how many sensors) | `results/channel_ablation_raw.png`, `channel_ablation_raw.csv` |
 | failure cases | `results/{raw,filtered}/failure_cases.png` + `failure_cases.csv` |
 | error rate vs position in the segment, accuracy per participant | `results/error_by_position.png`, `results/accuracy_per_subject.png` |
 | prediction timelines for one participant (strict, smoothed, calibrated) | `results/{raw,filtered}/predict_P2_0-104s*.png` |
@@ -488,24 +500,108 @@ for xb, yb in loader:
 ## 10. Project structure
 
 ```
-config.py          all constants: dataset facts, timeline, windowing, split, model, training
-data_loader.py     load MAT -> label segments -> windows -> subject split -> normalisation -> tensors
-model.py           EMGCNN + layer-by-layer summary + inference helpers (ensemble loading, AdaBN calibration)
-train.py           training loop (fit), checkpointing, early stopping, CLI
-evaluate.py        test-set metrics, confusion matrices, failure cases, curves
-cross_validate.py  leave-participants-out cross-validation (5 folds x 8 participants), pipeline comparison
-predict.py         predictions + probabilities for any window or time range of a recording
-baseline.py        RMS / MAV / WL features + logistic regression and random forest
-tune.py            small validation-only hyperparameter check
-compare.py         raw-vs-filtered table and figures
-plots.py           all figures
-plot_examples.py   dataset figures (example recording, example windows)
-sanity_checks.py   pre-training checks incl. overfitting a tiny subset
-results/           raw/, filtered/ (best_model_seed*.pt, history_seed*.csv, metrics, figures), figures/, cv/,
-                   baseline_results.json, comparison.md, tuning.csv
-docs/              the dataset paper
-sEMG-dataset/      the data (not included)
+network/                   neural-network side (no Qt)
+  main.py                  `python -m network.main <command>`: dispatches to the modules below
+  config.py                all constants: dataset facts, timeline, windowing, split, model, training, evaluation
+  data_loader.py           MAT -> labelled 6 s segments -> windows -> subject split -> normalisation -> tensors
+  model.py                 EMGCNN, layer-by-layer summary, ensemble loading, predict_proba, AdaBN calibration
+  train.py                 training loop (fit), 5-seed ensemble, checkpointing, early stopping
+  evaluate.py              test-set metrics, confusion matrices, failure cases, smoothing / merged-class / AdaBN views
+  cross_validate.py        leave-participants-out cross-validation of pipeline versions
+  predict.py               predictions for any window or time range of a dataset recording
+  inference.py             GestureClassifier: the inference API used by the app (preprocess, predict, calibrate)
+  recording.py             Recording dataclass, dataset-compatible MAT read/write, validation
+  streaming.py             window_starts(), StreamWindower (chunks -> 2000-sample windows every 1000 samples)
+  baseline.py tune.py compare.py plots.py plot_examples.py sanity_checks.py
+app/                       desktop application (PySide6 + pyqtgraph)
+  main.py                  `python -m app.main`
+  main_window.py           wiring of panel, views, acquisition controller and inference worker
+  control_panel.py         MODE / INPUT / MODEL / SIGNAL INFORMATION panel
+  signal_view.py           4-channel pyqtgraph view (live rolling window, offline scrubbing with window marker)
+  gesture_view.py          gesture cards; the predicted card gets the red outline
+  acquisition.py           RingBuffer, Recorder, AcquisitionController (source callbacks -> Qt signals)
+  inference_worker.py      QThread worker: model loading, streaming and batch inference, calibration
+  sources.py               SignalSource, FileSignalSource, ReplaySignalSource
+  delsys.py                DelsysTrignoSource: Trigno Control Utility TCP adapter (untested on hardware)
+  theme.py assets.py       colours + stylesheet; gesture images with drawn placeholders (app/assets/gestures/)
+tests/                     pytest suite (network, sources, Delsys fake server, offscreen GUI)
+results/                   raw/, filtered/ (best_model_seed*.pt, metrics, figures), cv/, figures/, comparison.md, tuning.csv
+recordings/                recordings saved by the app (created on first save, ignored by git)
+docs/                      the dataset paper
+sEMG-dataset/              the data (not in git; download from Mendeley 10.17632/ckwc76xr2z.2)
 ```
+
+---
+
+## 11. Desktop application (`python -m app.main`)
+
+A dark, turquoise-accented PySide6 application that reads 4-channel EMG from a file or from a live
+source, runs the trained ensemble and lights up the predicted gesture.
+
+**Two views** (buttons top right): *EMG signal* (four stacked channel plots: rolling window in live
+mode, scrollable recording with the current inference window marked in offline mode; pause, autoscale,
+visible seconds) and *Gestures* (one card per class with image, name and confidence; the predicted card
+has a red outline, the others are dimmed; the headline shows the prediction and, when smoothing is on,
+the raw per-window prediction next to it).
+
+**Offline mode.** Select file -> the file is validated (4 channels, at least one window, finite values,
+sampling rate present or assumed 2000 Hz with a warning; `[channels, samples]` files are transposed with
+a warning) -> the signal appears -> *Run inference* classifies every window (same windowing as training:
+1 s windows every 0.5 s) in the worker thread with a progress bar -> the window slider, *Play* and
+scrolling the signal move through the predictions; *Replay as live…* streams the same file through the
+live pipeline. Dataset files ending in `_filtered` select the filtered model automatically.
+
+**Live mode.** Choose the source: *Delsys Trigno Avanti (hardware)* or *Replay a recording (simulated)*.
+*Connect* -> *Start recording* begins acquisition, stores the samples, plots them and (optionally) runs
+inference on every new window -> *Stop recording* -> *Save recording…* writes a MAT file. The badge at
+the top always says which kind of source is active: **LIVE HARDWARE**, **SIMULATED / REPLAY** or **FILE**.
+*Calibrate on recent signal* re-estimates the network's BatchNorm statistics on the last seconds in the
+buffer (at least 11.5 s) and switches the predictions to the calibrated model (section 5); the checkbox
+in the MODEL panel switches back.
+
+**Model panel.** Shows the signal type (raw / filtered, from `results/<signal>/best_model_seed*.pt`), the
+network name, whether loading succeeded, the inference state, the smoothing toggle (average the
+probabilities of the last N windows; the raw prediction stays visible) and the calibration toggle. If no
+checkpoint is found the app still starts: signal viewing and recording work, prediction is disabled and
+the panel says why. Checkpoints are checked against the current configuration (channels, window length,
+gesture list, normalisation) and rejected with a message if they do not match.
+
+**Preprocessing consistency.** Both modes use `network.inference.GestureClassifier`, whose `preprocess`
+is the training normalisation itself (`data_loader.normalize`: per-window mean removal, division by the
+training-set channel std stored in the checkpoint) and whose windows come from `network.streaming`
+(`window_starts` for files, `StreamWindower` for streams). A test asserts that the offline and the live
+path hand identical `[n, 4, 2000]` float32 arrays to the network. The raw model expects unfiltered mV
+EMG at 2000 Hz; the filtered model expects the dataset's BIOPAC filtering (5-500 Hz + 50 Hz notch), which
+no live source provides, so the app warns when it is combined with hardware.
+
+**Supported input files.** `.mat` with the dataset's variables (`data` [samples, 4], `fs`, …), `.npz`
+with `data` and `fs`, header-less 4-column `.csv` (the dataset's csv layout; 2000 Hz assumed).
+
+**Recording format.** `scipy.io.savemat` with the dataset's variables (`data` in mV, `fs`, `iD`, `isi`,
+`isi_units`, `labels`, `start_sample`, `units`) plus `format_version`, `timestamp`, `source`
+(`delsys_trigno` / `replay`), `source_config` (JSON), `n_samples`, `duration_s`, `app`. Files land in
+`recordings/` by default and open again in offline mode, in MATLAB and with `scipy.io.loadmat`.
+
+**Delsys requirements and status.** The adapter (`app/delsys.py`) targets the Trigno Control Utility
+TCP SDK: ASCII commands on port 50040 (`BACKWARDS COMPATIBILITY ON`, `UPSAMPLE ON`, `START`, `STOP`,
+`QUIT`), EMG frames of 16 little-endian float32 values (volts, one per sensor slot) on port 50043 (50041
+for legacy sensors), 2000 Hz when upsampled. Host, ports, the four sensor numbers that carry CH1..CH4
+and the volts-to-mV factor are set in the panel. **It has not been tested against real hardware** (no
+Delsys software was available); it is tested against a fake TCU server in `tests/test_delsys_source.py`.
+When no TCU answers, *Connect* fails within two seconds with a message, nothing crashes. Expect a
+domain shift between the BIOPAC training data and Trigno recordings; calibration is the intended first
+remedy.
+
+**Threads.** Sources deliver samples from their own thread; `AcquisitionController` forwards them to the
+GUI thread (ring buffer for the plots, recorder), and `InferenceWorker` runs model loading, windowing,
+inference and calibration in a `QThread`. If inference falls behind, only the newest window is
+classified and the number of skipped windows is shown.
+
+**Development without hardware.** Use *Replay a recording (simulated)* or `python -m app.main --replay
+<file>`: a recording is streamed in real time at its sampling rate through the exact live path
+(buffering, inference, gesture highlighting, start/stop/save).
+
+---
 
 ## Reproducibility
 

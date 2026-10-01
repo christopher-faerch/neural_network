@@ -9,9 +9,9 @@ import argparse
 
 import numpy as np
 
-import config as C
-import plots
-from data_loader import load_recording, make_windows, remove_window_mean
+from network import config as C
+from network import plots
+from network.data_loader import load_recording, make_windows, remove_window_mean
 
 
 def main():

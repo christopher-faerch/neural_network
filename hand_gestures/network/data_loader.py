@@ -15,23 +15,27 @@ import json
 from dataclasses import dataclass, asdict
 
 import numpy as np
-import scipy.io as sio
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-import config as C
+from network import config as C
+from network.recording import load_recording_file
 
 
 # --------------------------------------------------------------------------- 1. loading
 def load_recording(subject: int, signal_type: str) -> np.ndarray:
-    """Return the 640 s recording of one participant as float32 array [n_samples, 4]."""
+    """Return the 640 s recording of one participant as float32 array [n_samples, 4].
+
+    The MAT parsing is shared with the desktop app (network.recording.load_recording_file); the
+    dataset-specific checks (length, sampling rate, participant id) stay here.
+    """
     assert signal_type in C.SIGNAL_TYPES, signal_type
     path = C.DATA_ROOT / signal_type / "mat" / f"{subject}_{signal_type}.mat"
-    mat = sio.loadmat(path)
-    data = mat["data"].astype(np.float32)
+    rec = load_recording_file(path)
+    data = rec.data
     assert data.shape == (C.RECORDING_SAMPLES, C.N_CHANNELS), f"{path}: unexpected shape {data.shape}"
-    assert int(mat["fs"].ravel()[0]) == C.FS, f"{path}: unexpected sampling rate"
-    assert int(mat["iD"].ravel()[0]) == subject, f"{path}: iD does not match file name"
+    assert int(rec.fs) == C.FS, f"{path}: unexpected sampling rate"
+    assert int(rec.meta.get("iD", subject)) == subject, f"{path}: iD does not match file name"
     return data
 
 

@@ -16,8 +16,8 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-import config as C
-from data_loader import prepare_data
+from network import config as C
+from network.data_loader import prepare_data
 
 FEATURE_NAMES = [f"{f}_CH{c + 1}" for f in ("RMS", "MAV", "WL") for c in range(C.N_CHANNELS)]
 

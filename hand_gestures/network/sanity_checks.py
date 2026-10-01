@@ -12,10 +12,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import config as C
-from data_loader import prepare_data, to_loader
-from model import EMGCNN, summarize
-from train import set_seed, get_device
+from network import config as C
+from network.data_loader import prepare_data, to_loader
+from network.model import EMGCNN, summarize
+from network.train import set_seed, get_device
 
 
 def main():

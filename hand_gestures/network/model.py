@@ -14,8 +14,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import config as C
-from data_loader import to_loader
+from network import config as C
+from network.data_loader import to_loader
 
 
 def conv_block(in_ch, out_ch, kernel_size, pool):
@@ -146,5 +146,10 @@ def predict_proba_adabn(models, X, meta, device):
     return probs
 
 
-if __name__ == "__main__":
+def print_summary():
+    """`python -m network.main summary`: print the layer table of a freshly built EMGCNN."""
     summarize(EMGCNN())
+
+
+if __name__ == "__main__":
+    print_summary()

@@ -7,8 +7,8 @@ results/accuracy_per_subject.png
 """
 import json
 
-import config as C
-import plots
+from network import config as C
+from network import plots
 
 
 def main():

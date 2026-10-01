@@ -12,9 +12,9 @@ import time
 
 import pandas as pd
 
-import config as C
-from data_loader import prepare_data
-from train import fit, get_device, set_seed
+from network import config as C
+from network.data_loader import prepare_data
+from network.train import fit, get_device, set_seed
 
 CONFIGS = [
     dict(lr=1e-3, batch_size=64, weight_decay=1e-4, dropout=0.3),     # config.py defaults at the time of writing

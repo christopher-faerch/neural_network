@@ -24,11 +24,11 @@ import pandas as pd
 from sklearn.metrics import (accuracy_score, classification_report, confusion_matrix, f1_score,
                              precision_recall_fscore_support)
 
-import config as C
-import plots
-from data_loader import SubjectSplit, load_recording, prepare_data, window_start_sample
-from model import load_ensemble, predict_proba, predict_proba_adabn
-from train import get_device, set_seed
+from network import config as C
+from network import plots
+from network.data_loader import SubjectSplit, load_recording, prepare_data, window_start_sample
+from network.model import load_ensemble, predict_proba, predict_proba_adabn
+from network.train import get_device, set_seed
 
 
 def smooth_probs(probs, meta, n=C.SMOOTH_WINDOWS):
@@ -244,7 +244,7 @@ def main():
 
 def build_rest_scale_for(signal_type, meta):
     """Rest-RMS scale factors for the windows in meta (only needed to plot rest_rms-normalised data in mV)."""
-    from data_loader import rest_rms
+    from network.data_loader import rest_rms
     scale = np.zeros((len(meta), C.N_CHANNELS), dtype=np.float32)
     for s in np.unique(meta[:, 0]):
         scale[meta[:, 0] == s] = rest_rms(load_recording(int(s), signal_type))

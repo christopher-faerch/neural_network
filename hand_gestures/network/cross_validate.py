@@ -24,11 +24,11 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 
-import config as C
-import plots
-from data_loader import build_windows, cv_folds, prepare_split_arrays
-from model import EMGCNN, predict_proba, predict_proba_adabn
-from train import fit, get_device, set_seed
+from network import config as C
+from network import plots
+from network.data_loader import build_windows, cv_folds, prepare_split_arrays
+from network.model import EMGCNN, predict_proba, predict_proba_adabn
+from network.train import fit, get_device, set_seed
 
 
 def main():

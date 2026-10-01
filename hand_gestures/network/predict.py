@@ -20,11 +20,12 @@ import argparse
 
 import numpy as np
 
-import config as C
-import plots
-from data_loader import load_recording, make_windows, normalize, segment_start_sample, window_start_sample
-from model import adapt_batchnorm, load_ensemble, predict_proba
-from train import get_device
+from network import config as C
+from network import plots
+from network.data_loader import load_recording, make_windows, normalize, segment_start_sample, window_start_sample
+from network.inference import causal_smooth
+from network.model import adapt_batchnorm, load_ensemble, predict_proba
+from network.train import get_device
 
 
 def label_at(sample: int):
@@ -41,14 +42,6 @@ def predict_windows(models, channel_std, recording, starts, device):
     """recording: [n_samples, 4] in mV. Returns ensemble softmax probabilities [n_windows, 10]."""
     X = np.stack([recording[s:s + C.WINDOW_SAMPLES].T for s in starts]).astype(np.float32)   # [n, 4, 2000]
     return predict_proba(models, normalize(X, channel_std), device)
-
-
-def causal_smooth(probs, n):
-    """Average each row with the previous n-1 rows (consecutive windows of one recording)."""
-    out = probs.copy()
-    for j in range(len(probs)):
-        out[j] = probs[max(0, j - n + 1):j + 1].mean(axis=0)
-    return out
 
 
 def main():
