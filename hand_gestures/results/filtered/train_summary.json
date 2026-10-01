@@ -1,0 +1,141 @@
+{
+  "signal_type": "filtered",
+  "device": "cuda",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "members": [
+    {
+      "seed": 42,
+      "best_epoch": 15,
+      "best_val_loss": 1.0063559226636534,
+      "best_val_acc": 0.6496296296296297,
+      "epochs_run": 23,
+      "seconds": 53.0
+    },
+    {
+      "seed": 43,
+      "best_epoch": 5,
+      "best_val_loss": 1.0911743046619273,
+      "best_val_acc": 0.6140740740740741,
+      "epochs_run": 13,
+      "seconds": 28.3
+    },
+    {
+      "seed": 44,
+      "best_epoch": 9,
+      "best_val_loss": 1.1316473753363998,
+      "best_val_acc": 0.6481481481481481,
+      "epochs_run": 17,
+      "seconds": 37.5
+    },
+    {
+      "seed": 45,
+      "best_epoch": 8,
+      "best_val_loss": 1.037460904651218,
+      "best_val_acc": 0.6418518518518519,
+      "epochs_run": 16,
+      "seconds": 34.4
+    },
+    {
+      "seed": 46,
+      "best_epoch": 10,
+      "best_val_loss": 1.0443598192709465,
+      "best_val_acc": 0.6318518518518519,
+      "epochs_run": 18,
+      "seconds": 39.0
+    }
+  ],
+  "mean_best_val_acc": 0.6371111111111112,
+  "total_train_seconds": 192.2,
+  "hyperparameters": {
+    "FS": 2000,
+    "N_CHANNELS": 4,
+    "N_SUBJECTS": 40,
+    "RECORDING_SAMPLES": 1280000,
+    "SIGNAL_TYPES": [
+      "raw",
+      "filtered"
+    ],
+    "GESTURES": [
+      "neutral",
+      "extension",
+      "flexion",
+      "ulnar_dev",
+      "radial_dev",
+      "grip",
+      "abduction",
+      "adduction",
+      "supination",
+      "pronation"
+    ],
+    "N_CLASSES": 10,
+    "N_CYCLES": 5,
+    "CYCLE_PERIOD_S": 134,
+    "FIRST_GESTURE_OFFSET_S": 4,
+    "GESTURE_PERIOD_S": 10,
+    "GESTURE_DURATION_S": 6,
+    "WINDOW_S": 1.0,
+    "HOP_S": 0.5,
+    "WINDOW_SAMPLES": 2000,
+    "HOP_SAMPLES": 1000,
+    "SEGMENT_START_OFFSET_S": 1.0,
+    "SEGMENT_END_TRIM_S": 0.0,
+    "WINDOWS_PER_SEGMENT": 9,
+    "NORMALIZATION": "train_std",
+    "SPLIT_SEED": 42,
+    "N_TRAIN_SUBJECTS": 28,
+    "N_VAL_SUBJECTS": 6,
+    "N_TEST_SUBJECTS": 6,
+    "CV_N_FOLDS": 5,
+    "CV_SEED": 42,
+    "CONV_CHANNELS": [
+      32,
+      64,
+      128
+    ],
+    "KERNEL_SIZES": [
+      15,
+      9,
+      5
+    ],
+    "POOL_SIZES": [
+      4,
+      4,
+      1
+    ],
+    "DROPOUT": 0.3,
+    "SEED": 42,
+    "ENSEMBLE_SIZE": 5,
+    "ENSEMBLE_SEEDS": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "BATCH_SIZE": 64,
+    "LEARNING_RATE": 0.001,
+    "WEIGHT_DECAY": 0.0001,
+    "MAX_EPOCHS": 40,
+    "EARLY_STOPPING_PATIENCE": 8,
+    "NUM_WORKERS": 0,
+    "AUGMENT": false,
+    "AUG_GAIN_RANGE": [
+      0.7,
+      1.4
+    ],
+    "AUG_NOISE_STD": 0.05,
+    "SMOOTH_WINDOWS": 3,
+    "MERGED_CLASS_GROUPS": {
+      "abduction": "fingers abd/add",
+      "adduction": "fingers abd/add",
+      "supination": "forearm rotation",
+      "pronation": "forearm rotation"
+    }
+  }
+}

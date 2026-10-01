@@ -1,0 +1,220 @@
+{
+  "signal_type": "filtered",
+  "normalization": "train_std",
+  "ensemble_size": 5,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "checkpoint_epochs": [
+    15,
+    5,
+    9,
+    8,
+    10
+  ],
+  "member_val_acc": [
+    0.6496296296296297,
+    0.6140740740740741,
+    0.6481481481481481,
+    0.6418518518518519,
+    0.6318518518518519
+  ],
+  "val_acc": 0.6511111111111111,
+  "member_test_acc": [
+    0.5996296296296296,
+    0.5892592592592593,
+    0.5855555555555556,
+    0.6218518518518519,
+    0.6025925925925926
+  ],
+  "mean_member_test_acc": 0.5997777777777777,
+  "test_acc": 0.6240740740740741,
+  "test_macro_precision": 0.6680110057608009,
+  "test_macro_recall": 0.624074074074074,
+  "test_macro_f1": 0.6318664797531888,
+  "test_segment_vote_acc": 0.6433333333333333,
+  "test_acc_smoothed": 0.6270370370370371,
+  "smooth_windows": 3,
+  "test_acc_merged_classes": 0.6833333333333333,
+  "merged_groups": [
+    "neutral",
+    "extension",
+    "flexion",
+    "ulnar_dev",
+    "radial_dev",
+    "grip",
+    "fingers abd/add",
+    "forearm rotation"
+  ],
+  "test_acc_adabn": 0.8451851851851852,
+  "test_macro_f1_adabn": 0.8457202848854889,
+  "acc_adabn_by_test_subject": {
+    "2": 0.8889,
+    "3": 0.7578,
+    "9": 0.8511,
+    "14": 0.9044,
+    "34": 0.7489,
+    "39": 0.92
+  },
+  "test_subjects": [
+    2,
+    3,
+    9,
+    14,
+    34,
+    39
+  ],
+  "n_test_windows": 2700,
+  "per_class": [
+    {
+      "gesture": "flexion",
+      "precision": 0.9854,
+      "recall": 1.0,
+      "f1": 0.9926,
+      "support": 270
+    },
+    {
+      "gesture": "extension",
+      "precision": 0.9947,
+      "recall": 0.6889,
+      "f1": 0.814,
+      "support": 270
+    },
+    {
+      "gesture": "grip",
+      "precision": 0.8711,
+      "recall": 0.6259,
+      "f1": 0.7284,
+      "support": 270
+    },
+    {
+      "gesture": "radial_dev",
+      "precision": 0.866,
+      "recall": 0.6222,
+      "f1": 0.7241,
+      "support": 270
+    },
+    {
+      "gesture": "supination",
+      "precision": 0.6772,
+      "recall": 0.637,
+      "f1": 0.6565,
+      "support": 270
+    },
+    {
+      "gesture": "ulnar_dev",
+      "precision": 0.5799,
+      "recall": 0.7259,
+      "f1": 0.6447,
+      "support": 270
+    },
+    {
+      "gesture": "abduction",
+      "precision": 0.512,
+      "recall": 0.6296,
+      "f1": 0.5648,
+      "support": 270
+    },
+    {
+      "gesture": "neutral",
+      "precision": 0.3505,
+      "recall": 0.6556,
+      "f1": 0.4568,
+      "support": 270
+    },
+    {
+      "gesture": "adduction",
+      "precision": 0.4513,
+      "recall": 0.3259,
+      "f1": 0.3785,
+      "support": 270
+    },
+    {
+      "gesture": "pronation",
+      "precision": 0.3921,
+      "recall": 0.3296,
+      "f1": 0.3581,
+      "support": 270
+    }
+  ],
+  "most_confused_pairs": [
+    {
+      "true": "pronation",
+      "predicted": "neutral",
+      "count": 101,
+      "pct_of_true_class": 37.4
+    },
+    {
+      "true": "adduction",
+      "predicted": "neutral",
+      "count": 92,
+      "pct_of_true_class": 34.1
+    },
+    {
+      "true": "neutral",
+      "predicted": "pronation",
+      "count": 60,
+      "pct_of_true_class": 22.2
+    },
+    {
+      "true": "grip",
+      "predicted": "neutral",
+      "count": 59,
+      "pct_of_true_class": 21.9
+    },
+    {
+      "true": "adduction",
+      "predicted": "abduction",
+      "count": 51,
+      "pct_of_true_class": 18.9
+    },
+    {
+      "true": "radial_dev",
+      "predicted": "adduction",
+      "count": 50,
+      "pct_of_true_class": 18.5
+    },
+    {
+      "true": "extension",
+      "predicted": "abduction",
+      "count": 49,
+      "pct_of_true_class": 18.1
+    },
+    {
+      "true": "abduction",
+      "predicted": "adduction",
+      "count": 41,
+      "pct_of_true_class": 15.2
+    }
+  ],
+  "acc_by_test_subject": {
+    "2": 0.5822,
+    "3": 0.6022,
+    "9": 0.7778,
+    "14": 0.7111,
+    "34": 0.4756,
+    "39": 0.5956
+  },
+  "error_by_window_position": [
+    0.43,
+    0.3733,
+    0.34,
+    0.32,
+    0.3667,
+    0.3667,
+    0.37,
+    0.3967,
+    0.42
+  ],
+  "error_by_cycle": [
+    0.3704,
+    0.3907,
+    0.3852,
+    0.3648,
+    0.3685
+  ]
+}

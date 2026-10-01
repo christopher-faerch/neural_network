@@ -1,0 +1,5 @@
+true,predicted,subject,cycle,position,p_predicted,p_true,test_window_index,windows_of_this_gesture_correct_for_this_subject,raw_clipped_fraction_CH1,raw_clipped_fraction_CH2,raw_clipped_fraction_CH3,raw_clipped_fraction_CH4,compared_with_subject,compared_with_correct_window_index,p_neutral,p_extension,p_flexion,p_ulnar_dev,p_radial_dev,p_grip,p_abduction,p_adduction,p_supination,p_pronation
+pronation,neutral,3,4,9,0.886,0.023,809,2/45,0.0,0.956,0.0,0.0,3,893,0.886,0.0,0.001,0.0,0.0,0.068,0.0,0.021,0.002,0.023
+adduction,neutral,34,3,9,0.863,0.032,2051,0/45,0.0,0.0,0.0,0.0,3,784,0.863,0.0,0.0,0.0,0.0,0.01,0.0,0.032,0.015,0.079
+neutral,pronation,14,2,7,0.854,0.015,1446,0/45,0.0,0.0,0.0,0.0,3,723,0.015,0.0,0.001,0.0,0.001,0.005,0.0,0.062,0.062,0.854
+grip,neutral,39,2,9,0.716,0.087,2393,2/45,0.0,0.0,0.0,0.0,39,2476,0.716,0.0,0.009,0.0,0.0,0.087,0.0,0.015,0.112,0.059

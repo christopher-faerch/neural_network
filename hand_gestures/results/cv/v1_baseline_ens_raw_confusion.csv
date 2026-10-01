@@ -1,0 +1,11 @@
+,neutral,extension,flexion,ulnar_dev,radial_dev,grip,abduction,adduction,supination,pronation
+neutral,1695,0,1,65,1,96,23,159,11,149
+extension,1,1877,0,113,4,4,192,9,0,0
+flexion,46,0,1994,4,65,31,3,26,2,29
+ulnar_dev,38,106,5,1406,80,9,237,142,151,26
+radial_dev,72,15,7,27,1251,157,254,346,15,56
+grip,243,0,59,3,67,1468,15,116,90,139
+abduction,226,103,5,188,206,38,883,471,28,52
+adduction,546,14,25,92,157,89,260,875,12,130
+supination,256,0,0,122,28,34,1,123,1284,352
+pronation,455,0,6,109,50,62,8,222,369,919

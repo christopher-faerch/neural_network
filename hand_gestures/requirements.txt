@@ -1,0 +1,11 @@
+# Core dependencies (versions used for the reported results; newer versions should work too).
+# PyTorch: install the build matching your hardware first, e.g. for CUDA 13.0
+#   pip install torch --index-url https://download.pytorch.org/whl/cu130
+# or CPU only
+#   pip install torch
+torch>=2.4
+numpy>=1.26
+scipy>=1.11
+pandas>=2.0
+matplotlib>=3.8
+scikit-learn>=1.4

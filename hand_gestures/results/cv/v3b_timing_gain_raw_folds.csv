@@ -1,0 +1,6 @@
+label,signal,fold,test_subjects,best_epoch,epochs_run,val_acc,test_acc,test_macro_f1,seconds
+v3b_timing_gain,raw,0,5 6 8 17 19 33 38 40,4,12,0.7086,0.6139,0.6004,11.0
+v3b_timing_gain,raw,1,11 21 22 25 26 28 29 36,7,15,0.6553,0.7125,0.7159,14.3
+v3b_timing_gain,raw,2,7 10 12 24 27 30 31 32,26,34,0.6922,0.6803,0.6754,30.6
+v3b_timing_gain,raw,3,1 4 16 18 20 23 35 37,8,16,0.6783,0.605,0.6088,15.2
+v3b_timing_gain,raw,4,2 3 9 13 14 15 34 39,3,11,0.6064,0.5769,0.5583,9.6

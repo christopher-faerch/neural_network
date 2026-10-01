@@ -1,0 +1,6 @@
+label,signal,fold,test_subjects,best_epoch,epochs_run,val_acc,test_acc,test_macro_f1,seconds
+v1_baseline,raw,0,5 6 8 17 19 33 38 40,1,9,0.6441,0.602,0.5986,11.0
+v1_baseline,raw,1,11 21 22 25 26 28 29 36,8,16,0.6098,0.6739,0.6743,16.6
+v1_baseline,raw,2,7 10 12 24 27 30 31 32,5,13,0.5868,0.5682,0.5568,13.8
+v1_baseline,raw,3,1 4 16 18 20 23 35 37,11,19,0.6414,0.59,0.5874,20.3
+v1_baseline,raw,4,2 3 9 13 14 15 34 39,2,10,0.5695,0.552,0.5476,11.2

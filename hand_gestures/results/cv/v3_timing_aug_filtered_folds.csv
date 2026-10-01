@@ -1,0 +1,6 @@
+label,signal,fold,test_subjects,best_epoch,epochs_run,val_acc,test_acc,test_macro_f1,seconds
+v3_timing_aug,filtered,0,5 6 8 17 19 33 38 40,16,24,0.6844,0.6231,0.6277,18.3
+v3_timing_aug,filtered,1,11 21 22 25 26 28 29 36,5,13,0.6478,0.6278,0.6377,10.4
+v3_timing_aug,filtered,2,7 10 12 24 27 30 31 32,21,29,0.6617,0.6428,0.6494,22.7
+v3_timing_aug,filtered,3,1 4 16 18 20 23 35 37,5,13,0.6467,0.5842,0.5771,10.3
+v3_timing_aug,filtered,4,2 3 9 13 14 15 34 39,9,17,0.6281,0.6578,0.656,13.1

@@ -1,0 +1,16 @@
+              precision    recall  f1-score   support
+
+     neutral      0.391     0.722     0.507       270
+   extension      0.995     0.696     0.819       270
+     flexion      1.000     0.981     0.991       270
+   ulnar_dev      0.737     0.696     0.716       270
+  radial_dev      0.712     0.789     0.749       270
+        grip      0.864     0.752     0.804       270
+   abduction      0.548     0.674     0.605       270
+   adduction      0.438     0.211     0.285       270
+  supination      0.773     0.770     0.772       270
+   pronation      0.537     0.452     0.491       270
+
+    accuracy                          0.674      2700
+   macro avg      0.700     0.674     0.674      2700
+weighted avg      0.700     0.674     0.674      2700
